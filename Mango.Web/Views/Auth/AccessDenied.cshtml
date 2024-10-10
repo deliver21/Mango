@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "Access Denied 403";
+}
+<div class="container text-center">
+    <div class="access-denied p-5 bg-light border rounded shadow-sm">
+        <h1 class="display-4 text-danger">Access Denied!</h1>
+        <p class="lead">Oops! It looks like you don't have permission to access this page.</p>
+        <img src="~/image/StatusCode/403-forbidden.png" alt="Funny Access Denied Image" class="denied-img mb-4" style="max-width: 100%; height: auto; max-height: 300px;">
+        <p>Sorry, not even cute kittens can get you through!</p>
+        <a href="/" class="btn btn-primary">Go Back to Safety</a>
+        @*@Url.Action("Index", "Home")*@
+    </div>
+</div>
