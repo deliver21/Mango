@@ -1,33 +1,29 @@
 ﻿using Mango.Services.ShoppingCartAPI.Utilities;
 using Mango.Services.ShoppingCartAPI.IService;
 using Mango.Services.ShoppingCartAPI.Models.DTO;
+using Newtonsoft.Json;
 
 namespace Mango.Services.ShoppingCartAPI
 {
     public class ProductService : IProductService
     {
-        private readonly IBaseService _baseService;
-        public ProductService(IBaseService baseService) 
-        { 
-            _baseService = baseService;
-        }  
-        public async Task<ResponseDto?> GetAllProductAsync()
+        IHttpClientFactory _httpClientFactory;
+        public ProductService(IHttpClientFactory httpClientFactory)
         {
-            return await _baseService.SendAsync(new RequestDto()
-            {
-                ApiType = SD.ApiType.GET,
-                Url = SD.ProductAPIBase + "/api/product"
-            });
+            _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<ResponseDto?> GetProductByIdAsync(int id)
+        public async Task<List<ProductDto?>> GetAllProductAsync()
         {
-            return await _baseService.SendAsync(new RequestDto()
-            {
-                ApiType = SD.ApiType.GET,
-                Data=id,
-                Url = SD.ProductAPIBase + "/api/product/"+ id
-            });
+           var client = _httpClientFactory.CreateClient("Product");
+           var response = await client.GetAsync($"api/product");
+           var apiContent = await response.Content.ReadAsStringAsync();
+           var resp = JsonConvert.DeserializeObject<ResponseDto>(apiContent);
+           if (resp != null && resp.Result != null)
+           {
+             return JsonConvert.DeserializeObject<List<ProductDto>>(resp.Result.ToString());
+           }
+            return new List<ProductDto?>();
         }
     }
 }

@@ -26,20 +26,22 @@ builder.Services.AddHttpClient();
 
 //Link with Product Service
 builder.Services.AddHttpClient<IProductService, ProductService>();
-
-//Populate AuthAPI Urls strored in Program Cs
-SD.ProductAPIBase = builder.Configuration["ServiceUrls:ProductAPI"];
-
 // Auto Mapper Services configuration
 IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
 builder.Services.AddSingleton(mapper); //Lifetime of the service
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddControllers();
 
+builder.Services.AddHttpContextAccessor();
+//Api Authentification Handler####################################
+builder.Services.AddScoped<BackendApiAuthenticationHttpClientHandler>();
+
 //Another Way to use HttpClientfactory experienced with couponApi
 builder.Services.AddHttpClient("Coupon",u=>u.BaseAddress=
-new Uri(builder.Configuration["ServiceUrls:CouponAPI"]));
+new Uri(builder.Configuration["ServiceUrls:CouponAPI"])).AddHttpMessageHandler<BackendApiAuthenticationHttpClientHandler>();
 
+builder.Services.AddHttpClient("Product", u => u.BaseAddress =
+new Uri(builder.Configuration["ServiceUrls:ProductAPI"])).AddHttpMessageHandler<BackendApiAuthenticationHttpClientHandler>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

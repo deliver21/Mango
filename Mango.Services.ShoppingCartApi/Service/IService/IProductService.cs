@@ -4,7 +4,7 @@ namespace Mango.Services.ShoppingCartAPI
 {
     public interface IProductService
     {
-        Task <ResponseDto?> GetAllProductAsync();
-        Task<ResponseDto?> GetProductByIdAsync(int id);        
+        Task <List<ProductDto>?> GetAllProductAsync();
+        //Task<ResponseDto?> GetProductByIdAsync(int id);        
     }
 }

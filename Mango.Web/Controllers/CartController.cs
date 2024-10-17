@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 
 namespace Mango.Web.Controllers
 {
+    [Authorize]
     public class CartController : Controller
     {
         private readonly ICartService _cartService;
@@ -29,6 +30,43 @@ namespace Mango.Web.Controllers
                 return cartDto;
             }
             return new CartDto();
+        }
+        public async Task<IActionResult> Remove(int cartDetailsId)
+        {
+            var userId = User.Claims.Where(u => u.Type == JwtRegisteredClaimNames.Sub)?.FirstOrDefault()?.Value;
+            var response = await _cartService.RemoveCartAsync(cartDetailsId);
+            if (response != null && response.IsSuccess)
+            {
+                TempData["success"] = "Cart is successfully updated";
+                return RedirectToAction(nameof(CartIndex));
+            }
+            TempData["error"] = "invalid operation";
+            return RedirectToAction(nameof(CartIndex));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ApplyCoupon(CartDto cartDto)
+        {
+            var response = await _cartService.ApplyCouponAsync(cartDto);
+            if (response != null && response.IsSuccess)
+            {
+                TempData["success"] = "Coupon is successfully set";
+                return RedirectToAction(nameof(CartIndex));
+            }
+            TempData["error"] = "invalid coupon entered";
+            return RedirectToAction(nameof(CartIndex));
+        }
+        [HttpPost]
+        public async Task<IActionResult> RemoveCoupon(CartDto cartDto)
+        {
+            var response = await _cartService.RemoveCouponAsync(cartDto);
+            if (response != null && response.IsSuccess)
+            {
+                TempData["success"] = "Coupon is successfully removed";
+                return RedirectToAction(nameof(CartIndex));
+            }
+            TempData["error"] = "invalid operation";
+            return RedirectToAction(nameof(CartIndex));
         }
     }
 }

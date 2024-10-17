@@ -10,7 +10,7 @@ namespace Mango.Web.Models
         public string Description { get; set; }
         public string CategoryName { get; set; }
         public string ImageUrl { get; set; }
-        [Range(0,100)]
+        [Range(1,100,ErrorMessage ="The product must be at least one")]
         public int Count { get; set; }
     }
 }

@@ -11,8 +11,8 @@
         public static string ShoppingCartAPIBase { get; set; }
 
         //Roles
-        public static string RoleAdmin = "Admin";
-        public static string RoleCustomer = "Customer";
+        public static string RoleAdmin = "ADMIN";
+        public static string RoleCustomer = "CUSTOMER";
 
         //Token Key
         public static string tokenCookie = "JWTToken";
