@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection.PortableExecutable;
 using System.Text.Json;
 using Mango.Services.ShoppingCartAPI.Service.IService;
+using Mango.MessageBus;
 
 namespace Mango.Services.ShoppingCartAPI.Controllers
 {
@@ -21,14 +22,21 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
         private readonly AppDbContext _db;
         private readonly IProductService _productService;
         private readonly ICouponService _couponService;
-        public CartAPIController(AppDbContext db, IMapper mapper, IProductService productService,ICouponService couponService)
+        private IMessageBus _messageBus;
+        private readonly IConfiguration _configuration; 
+
+        public CartAPIController(AppDbContext db, IMapper mapper, IProductService productService,
+            ICouponService couponService, IMessageBus messageBus, IConfiguration configuration)
         {
             _db = db;
             _mapper = mapper;
             this._response = new ResponseDto();
             _productService = productService;
             _couponService = couponService;
+            _messageBus = messageBus;
+            _configuration = configuration;
         }
+
         [HttpGet("GetCart/{userId}")]
         public async Task<ResponseDto> GetCart(string userId)
         {
@@ -76,7 +84,6 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
             }
             return _response;
         }
-
 
         [HttpPost("ApplyCoupon")]
         public async Task<Object> ApplyCoupon([FromBody] CartDto cartDto)
@@ -146,10 +153,9 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
                 }
                 else
                 {
-                    //if header is not null
-                    //check if details has same product
-                    var cartDetailsFromDb= await _db.CartDetails.AsNoTracking().FirstOrDefaultAsync(u=>u.ProductId == cartDto.CartDetails.First().ProductId
-                    && u.CartHeaderId==cartHeaderFromDb.CartHeaderId);
+                    //if header is not null  /check if details has same product                    
+                    var cartDetailsFromDb = await _db.CartDetails.AsNoTracking().FirstOrDefaultAsync(u=>
+                    u.ProductId == cartDto.CartDetails.First().ProductId && u.CartHeaderId==cartHeaderFromDb.CartHeaderId);
                     if(cartDetailsFromDb==null)
                     {
                         //Create an another CartDetails because it does not exist
@@ -176,6 +182,7 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
             }
             return _response;
         }
+
         [HttpPost("RemoveCart")]
         public async Task<ResponseDto> RemoveCart([FromBody] int cartDetailsId)
         {
@@ -198,6 +205,23 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
             {
                 _response.IsSuccess = false;
                 _response.Message=ex.Message.ToString();
+            }
+            return _response;
+        }
+
+        //Azure Service Bus Logic
+        [HttpPost("EmailCartRequest")]
+        public async Task<Object> EmailCartRequest([FromBody] CartDto cartDto)
+        {
+            try
+            {
+                //Second Parameter from Azure Service online , but populated from appSettings Json
+                await _messageBus.PublishMessage(cartDto, _configuration.GetValue<string>("TopicAndQueueNames:EmailShoppingCartQueue"));
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.Message.ToString();
             }
             return _response;
         }

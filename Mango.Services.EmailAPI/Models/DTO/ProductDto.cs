@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Mango.Web.Models
+namespace Mango.Services.EmailAPI.Models.DTO
 {
     public class ProductDto
     {
@@ -10,7 +10,6 @@ namespace Mango.Web.Models
         public string Description { get; set; }
         public string CategoryName { get; set; }
         public string ImageUrl { get; set; }
-        [Range(1,100,ErrorMessage ="The product must be at least one")]
         public int Count { get; set; }
     }
 }

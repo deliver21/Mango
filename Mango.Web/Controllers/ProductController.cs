@@ -60,7 +60,7 @@ namespace Mango.Web.Controllers
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> ProductDelete(ProductDto product)
         {
-                ResponseDto? response = await _productService.DeleteProductAsync(product.productId);
+                ResponseDto? response = await _productService.DeleteProductAsync(product.ProductId);
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Product deleted successfully";
@@ -70,14 +70,14 @@ namespace Mango.Web.Controllers
                 {
                     TempData["error"] = "The App couldn't delete the product";
                 }            
-            return View(new ProductDto{productId=product.productId,Name=product.Name,Description=product.Description,
-                CategoryName=product.CategoryName,Price=product.Price,ImageUrl=product.ImageUrl
+            return View(new ProductDto{ProductId = product.ProductId , Name=product.Name,Description=product.Description ,
+                CategoryName = product.CategoryName ,Price = product.Price , ImageUrl = product.ImageUrl
             });
         }
         public async Task <IActionResult> ProductEdit(int productId)
         {
             ResponseDto response = new();
-            response=await _productService.GetProductByIdAsync(productId);
+            response = await _productService.GetProductByIdAsync(productId);
             ProductDto product = new();
             if (response != null && response.IsSuccess)
             {
@@ -102,7 +102,7 @@ namespace Mango.Web.Controllers
             }
             return View(new ProductDto
             {
-                productId = product.productId,
+                ProductId = product.ProductId,
                 Name = product.Name,
                 Description = product.Description,
                 CategoryName = product.CategoryName,

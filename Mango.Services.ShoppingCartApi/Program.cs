@@ -1,4 +1,5 @@
 using AutoMapper;
+using Mango.MessageBus;
 using Mango.Services.ShoppingCartAPI;
 using Mango.Services.ShoppingCartAPI.Data;
 using Mango.Services.ShoppingCartAPI.Extensions;
@@ -14,7 +15,6 @@ using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(option =>
 option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -79,6 +79,10 @@ builder.AddAppAuthentification();
 builder.Services.AddScoped<IBaseService, BaseService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICouponService,CouponService>();
+
+//Add Scope for MessageBus class from Mango.MessageBus Project
+// And we added Mango.MessageBus Project reference
+builder.Services.AddScoped<IMessageBus, MessageBus>();
 
 
 var app = builder.Build();

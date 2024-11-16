@@ -13,11 +13,13 @@ namespace Mango.Web.Controllers
     {
         private readonly IProductService _productService;
         private readonly ICartService _cartService;
+
         public HomeController(IProductService productService, ICartService cartService)
         {
             _productService = productService;
             _cartService = cartService;
         }
+
         public async Task <IActionResult> Index()
         {
             ResponseDto? responseDto= new ResponseDto();
@@ -30,6 +32,7 @@ namespace Mango.Web.Controllers
             }
             return View(list);
         }
+
         public async Task <IActionResult> ProductDetails(int productId)
         {
             ResponseDto responseDto = new();
@@ -41,7 +44,8 @@ namespace Mango.Web.Controllers
                 return View(productDto);
             }
             return NotFound();
-        }
+        } 
+
         [Authorize]
         [HttpPost]
         [ActionName("ProductDetails")]
@@ -58,14 +62,15 @@ namespace Mango.Web.Controllers
             CartDetailsDto cartDetailsDto = new CartDetailsDto()
             {
                 Count = productDto.Count,
-                ProductId=productDto.productId
+                ProductId = productDto.ProductId
             };
-            List<CartDetailsDto> cartDetailsDtos=new List<CartDetailsDto>()
+            List<CartDetailsDto> cartDetailsDtos = new List<CartDetailsDto>()
             { 
                 cartDetailsDto
             };
             cartDto.CartDetails = cartDetailsDtos;
             var responseDto = await _cartService.CartUpsertAsync(cartDto);
+
             if (responseDto != null && responseDto.IsSuccess)
             {
                 TempData["success"] = $"The product {productDto.Name} is successfully added to the Cart";
